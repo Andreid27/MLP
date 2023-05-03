@@ -13,9 +13,14 @@ def init_params(layers, neurons):
 def Sigmoid(Z):
     Z = np.array(Z, dtype=np.float128)
     return 1 / (1 + np.exp(-Z))
-
 def derivative_Sigmdoid(Z):
     return Z*(1-Z)
+def ReLu(Z):
+    Z = np.array(Z, dtype=np.float128)
+    return np.maximum(0, Z)
+
+def derivative_ReLu(Z):
+    return np.minimum(0.0, Z)
 
 def cost_function(o, nr_correct, l):
     # Cost / Error calculation
@@ -27,10 +32,14 @@ def verify_classification(o, nr_correct, l):
     # Verify if is correct
     nr_correct += int(np.argmax(o) == np.argmax(l))
     return nr_correct
-def forward_propagation(b_h_i, w_h_i,h):
+def forward_propagation(b_h_i, w_h_i,h, activation_function):
     # Forward propagation hidden -> output
     o_pre = b_h_i + w_h_i @ h
-    o = Sigmoid(o_pre)
+    match activation_function:
+        case "SIGMOID":
+            o = Sigmoid(o_pre)
+        case "RELU":
+            o = ReLu(o_pre)
     return o
 
 def forward_propagation_one_image(b_i_h, w_i_h, b_h_o, w_h_o,img):
@@ -43,32 +52,36 @@ def forward_propagation_one_image(b_i_h, w_i_h, b_h_o, w_h_o,img):
     o = Sigmoid(o_pre)
     return o
 
-def forward_propagation_layers(layers, b_i, w_i,img):
+def forward_propagation_layers(layers, b_i, w_i,img, activation_function):
     h=[]
-    o = forward_propagation(b_i[0], w_i[0], img)
+    o = forward_propagation(b_i[0], w_i[0], img, activation_function)
     h.append(o)
     for i in range(layers):
-        o = forward_propagation(b_i[i+1], w_i[i+1], o)
+        o = forward_propagation(b_i[i+1], w_i[i+1], o, activation_function)
         h.append(o)
     return o,h
 
-def backward_propagation(w_i, b_i, delta_o, h , i, learn_rate):
+def backward_propagation(w_i, b_i, delta_o, h , i, learn_rate, activation_function):
     # Backpropagation output -> hidden (cost function derivative)
     # delta_o  -> previous delta_h
-    delta_h = np.transpose(w_i[i + 1]) @ delta_o * derivative_Sigmdoid(h[i + 1])
+    match activation_function:
+        case "SIGMOID":
+            delta_h = np.transpose(w_i[i + 1]) @ delta_o * derivative_Sigmdoid(h[i + 1])
+        case "RELU":
+            delta_h = np.transpose(w_i[i + 1]) @ delta_o * derivative_ReLu(h[i + 1])
     w_i[i] += -learn_rate * delta_h @ np.transpose(h[i])
     b_i[i] += -learn_rate * delta_h
     return w_i, b_i, delta_h
 
 
-def backward_propagation_layers(layers, b_i, w_i, o, l, h, img, learn_rate):
+def backward_propagation_layers(layers, b_i, w_i, o, l, h, img, learn_rate, activation_function):
     # Backpropagation output -> hidden (cost function derivative)
     h.insert(0,img)
     delta_o = o - l
     w_i[layers] += -learn_rate * delta_o @ np.transpose(h[layers])
     b_i[layers] += -learn_rate * delta_o
     for i in range(layers-1, -1, -1):
-        w_i, b_i, delta_o = backward_propagation(w_i,b_i,delta_o,h,i,learn_rate)
+        w_i, b_i, delta_o = backward_propagation(w_i,b_i,delta_o,h,i,learn_rate, activation_function)
     return b_i, w_i
 
 

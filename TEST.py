@@ -5,6 +5,8 @@ import NN_MNIST
 from data import get_mnist
 
 _, _, test_images , test_labels = get_mnist()
+Sigmoid = "SIGMOID"
+ReLu = "RELU"
 
 with open("trained_params.pkl","rb") as dump_file:
     b_i, w_i = pickle.load(dump_file)
@@ -20,7 +22,7 @@ nr_correct = 0
 for img, l in zip(test_images, test_labels):
     img.shape += (1,)
     l.shape += (1,)
-    o, h = NN_MNIST.forward_propagation_layers(hidden_layers, b_i, w_i, img)
+    o, h = NN_MNIST.forward_propagation_layers(hidden_layers, b_i, w_i, img, ReLu)
     nr_correct = NN_MNIST.verify_classification(o, nr_correct, l)
 
 print(f"Acc: {round((nr_correct / test_images.shape[0]) * 100, 2)}%")
