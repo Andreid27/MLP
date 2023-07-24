@@ -12,10 +12,9 @@ nr_correct = 0
 train_images, train_labels, test_images, test_labels = get_mnist()
 
 learn_rate = 0.01
-epochs = 3
-neurons_per_layer = [784, 40, 20, 10]
+epochs = 7
+neurons_per_layer = [784, 20, 12, 10]
 activation_function = Sigmoid
-#TODO debug ReLu or replace ReLu function.
 
 hidden_layers = len(neurons_per_layer) - 2
 w_i, b_i = NN_MNIST.init_params(hidden_layers, neurons_per_layer)
@@ -34,6 +33,8 @@ for epochs in range(epochs):
     print(f"Epoch: {epochs}")
     print(f"Acc for train set: {round((nr_correct / train_images.shape[0]) * 100, 2)}%")
     nr_correct = 0
+
+    #TODO move test_images to a separate function
 
     # Results for this epoch on test set
     for img, l in zip(test_images, test_labels):

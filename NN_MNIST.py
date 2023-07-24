@@ -21,6 +21,10 @@ def ReLu(Z):
 
 def derivative_ReLu(Z):
     return np.minimum(0.0, Z)
+def softmax(Z):
+    """Compute softmax values for each sets of scores in x."""
+    exp = np.exp(Z - np.max(Z)) #le np.max(Z) evite un overflow en diminuant le contenu de exp
+    return exp / exp.sum(axis=0)
 
 def cost_function(o, nr_correct, l):
     # Cost / Error calculation
@@ -58,6 +62,8 @@ def forward_propagation_layers(layers, b_i, w_i,img, activation_function):
     h.append(o)
     for i in range(layers):
         o = forward_propagation(b_i[i+1], w_i[i+1], o, activation_function)
+        if (i == layers) and (activation_function == "RELU"):
+            o = softmax(o)  # Apply softmax activation in the output layer
         h.append(o)
     return o,h
 
