@@ -1,8 +1,6 @@
 import pickle
-from matplotlib import pyplot as plt
 
 import NN_MNIST
-from data import get_mnist
 
 _, _, test_images , test_labels = get_mnist()
 Sigmoid = "SIGMOID"

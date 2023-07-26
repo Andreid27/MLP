@@ -1,19 +1,20 @@
 import pickle
 
-import NN_MNIST
-from data import get_mnist
 import numpy as np
+
+import NN_MNIST
+from data import preprocess_data
 
 # w = weights, b = bias, i = input, h = hidden, o = output, l = label
 Sigmoid = "SIGMOID"
 ReLu = "RELU"
 nr_correct = 0
 
-train_images, train_labels, test_images, test_labels = get_mnist()
+train_images, train_labels, test_images, test_labels = preprocess_data()
 
 learn_rate = 0.01
 epochs = 3
-neurons_per_layer = [784, 40, 20, 10]
+neurons_per_layer = [10, 8, 5, 2]
 activation_function = Sigmoid
 #TODO debug ReLu or replace ReLu function.
 
@@ -23,6 +24,8 @@ w_i, b_i = NN_MNIST.init_params(hidden_layers, neurons_per_layer)
 
 for epochs in range(epochs):
     for img, l in zip(train_images, train_labels):
+        print(type(train_images))
+        print(type(train_labels))
         img.shape += (1,)
         l.shape += (1,)
         o, h = NN_MNIST.forward_propagation_layers(hidden_layers, b_i, w_i, img, activation_function)
