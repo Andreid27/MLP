@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 
 # Import sklearn
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.model_selection import train_test_split
 
 def preprocess_data():
@@ -61,9 +61,29 @@ def preprocess_data():
     # Split the data into 80% training and 20% testing
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    # Create two new columns for each possible value of the label using pandas.get_dummies()
-    label_train = pd.get_dummies(y_train, prefix="Case")
-    label_test = pd.get_dummies(y_test, prefix="Case")
+
+    # -------- DATA FOR FRUITS TEST ---------
+    fruits = pd.read_table('fruit_data_with_colors.txt')
+    fruits.head()
+
+    # Prepare data for classification
+
+    feature_names = ['mass', 'width', 'height', 'color_score']
+    X = fruits[feature_names]
+    y = fruits['fruit_label']
+    # X1 = fruits1[feature_names]
+    # y1 = fruits1['fruit_label']
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
+
+    scaler = MinMaxScaler()
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.transform(X_test)
+
+
+    # # Create two new columns for each possible value of the label using pandas.get_dummies()
+    label_train = pd.get_dummies(y_train, prefix="fruit_label")
+    label_test = pd.get_dummies(y_test, prefix="fruit_label")
 
     # Convert the encoded label DataFrames into numpy arrays
     y_train = label_train.to_numpy()

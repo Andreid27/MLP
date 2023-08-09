@@ -14,7 +14,7 @@ train_images, train_labels, test_images, test_labels = preprocess_data()
 
 learn_rate = 0.1
 epochs = 1000
-neurons_per_layer = [5, 4, 4, 3, 3, 2]
+neurons_per_layer = [4, 60, 4]
 activation_function = ReLu
 #TODO debug ReLu or replace ReLu function.
 
