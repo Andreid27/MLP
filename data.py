@@ -7,34 +7,19 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 
 def preprocess_data():
-
-
-    # Load the CSV file as a pandas DataFrame
-    df = pd.read_csv("wnw_greece.csv")
+    df = pd.read_csv("wnf_case_eu.csv")
 
     # Select the columns that contain the features you want
     # In this case, we assume you want all the columns except the first one (recordid) and the last one (Positive PCR)
-    features = df.iloc[:, 1:-1]
+    features = df.iloc[:, :]
 
-    #--DATA PROCESSING --
-
-    # Convert the date columns into datetime objects
-    features["date_used_for_statistics"] = pd.to_datetime(features["date_used_for_statistics"])
-    features["date_of_onset"] = pd.to_datetime(features["date_of_onset"])
-    features["date_of_diagnosis"] = pd.to_datetime(features["date_of_diagnosis"])
-
+    # --DATA PROCESSING --
 
     # Convert "place_of_Infection" column to categorical
-    features["place_of_Infection"] = features["place_of_Infection"].astype("category")
-    # Assign numerical codes to the categories
-    features["place_of_Infection_code"] = features["place_of_Infection"].cat.codes
-
-    # List of columns to ignore (date columns)
-    date_columns_to_ignore = ["date_used_for_statistics", "date_of_onset", "date_of_diagnosis", "place_of_Infection"]
-
+    date_columns_to_ignore = ["date_used_for_statistics", "date_of_onset", "date_of_diagnosis", "place_of_infection",
+                              "reportingcountry", "labmethod", "specimenwnf", "id"]
     # Drop the date columns from the DataFrame
     features = features.drop(date_columns_to_ignore, axis=1)
-
 
     # Convert the gender column into two binary columns (F and M)
     features["gender"] = features["gender"].map(gender_to_num)
@@ -47,12 +32,14 @@ def preprocess_data():
     features["age"] = scaler.fit_transform(features["age"].values.reshape(-1, 1))
 
     # Replace the Case classification column with 0 and 1 (PROB and CONF)
-    features["Case classification (CONF=confirmed, PROB=probable)"] = features[
-        "Case classification (CONF=confirmed, PROB=probable)"].replace({"PROB": 0, "CONF": 1})
+    features["case_classification"] = features[
+        "case_classification"].replace({"PROB": 0, "CONF": 1})
 
     # Drop the Case classification column from the features DataFrame and assign it to the labels DataFrame
-    labels = features["Case classification (CONF=confirmed, PROB=probable)"]
-    features = features.drop("Case classification (CONF=confirmed, PROB=probable)", axis=1)
+    labels = features["case_classification"]
+    features = features.drop("case_classification", axis=1)
+
+    print(features.columns)
 
     # Convert the features and labels DataFrames into numpy arrays
     X = features.to_numpy()
@@ -72,14 +59,14 @@ def preprocess_data():
     return X_train,y_train,X_test,y_test
 
 
-
 def gender_to_num(gender):
     if gender == "F":
         return 0
     elif gender == "M":
         return 1
     else:
-        return None # in case of missing or invalid values
+        return 2  # in case of missing or invalid values
+
 
 def neuro_to_num(gender):
     if gender == "NEURO":
@@ -87,4 +74,21 @@ def neuro_to_num(gender):
     elif gender == "O":
         return 1
     else:
-        return None # in case of missing or invalid values
+        return 2  # in case of missing or invalid values
+
+
+# Load the CSV file as a pandas DataFrame
+def lab_to_num(method):
+    if method == "SIGM":
+        return 0
+    else:
+        return 1  #
+
+
+def specimen_to_num(specimen):
+    if specimen == "CSF":
+        return 0
+    elif specimen == "BLOOD":
+        return 1
+    else:
+        return 2  # in case of missing or invalid values
