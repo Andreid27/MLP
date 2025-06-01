@@ -3,7 +3,7 @@ import pickle
 import numpy as np
 
 import NN_MNIST
-from data import preprocess_data
+from data_with_test import preprocess_data
 
 # w = weights, b = bias, i = input, h = hidden, o = output, l = label
 Sigmoid = "SIGMOID"
@@ -14,7 +14,7 @@ train_images, train_labels, test_images, test_labels = preprocess_data()
 
 learn_rate = 0.01
 epochs = 1000
-neurons_per_layer = [len(train_images[0]), 4, 4, 3, 3, 2]
+neurons_per_layer = [6, 150, 200, 50, 35, 2]
 activation_function = Sigmoid
 #TODO debug ReLu or replace ReLu function.
 
